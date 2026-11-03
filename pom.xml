@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>codes.rafael.jenesis</groupId>
+    <artifactId>intellij-plugin</artifactId>
+    <version>0.1.0</version>
+
+    <name>Jenesis for IntelliJ IDEA</name>
+    <description>Loads a Jenesis build into IntelliJ IDEA and runs its selectors.</description>
+    <url>https://github.com/raphw/jenesis-intellij</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>raphw</id>
+            <name>Rafael Winterhalter</name>
+            <email>rafael.wth@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/raphw/jenesis-intellij</url>
+        <connection>scm:git:https://github.com/raphw/jenesis-intellij.git</connection>
+    </scm>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <intellij.version>252.28539.149</intellij.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>analysis</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>core</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>core-ui</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>editor-ui</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>execution</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>extensions</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>ide</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>ide-core</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>ide-util-io</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>jps-model</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>project-model</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>util</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>util-base</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>util-rt</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jetbrains.intellij.platform</groupId>
+            <artifactId>util-ui</artifactId>
+            <version>${intellij.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>2.2.0</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.13.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.27.6</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <!--jenesis.pin
+    com.jetbrains.intellij.platform/analysis 252.28539.149 SHA-256/92785c8c8042faf2b7d8df5fd65bde7ec875799460915c9d7f86b440c5fcf2a7
+    maven/com.jetbrains.intellij.platform/analysis/pom 252.28539.149 SHA-256/0022703bf40a862b596973cbd28d8e45f0c0b1caafea212cfd0f0cf58bc4c037
+    com.jetbrains.intellij.platform/core 252.28539.149 SHA-256/cad154d368f81b291f3c5687643d866f41f35f246346d40dc0c6b48226f2e32b
+    com.jetbrains.intellij.platform/core-ui 252.28539.149 SHA-256/5e7a3067e6cb5853b440838f141cf593f0b0f52b6f046f98dcf70bf11dc40ed2
+    maven/com.jetbrains.intellij.platform/core-ui/pom 252.28539.149 SHA-256/cb390199ac6a522e1c34b1d1b0b59be7a78311f86fd579c6e0141e9a8a1d885d
+    maven/com.jetbrains.intellij.platform/core/pom 252.28539.149 SHA-256/b9eca4d4ce3571e30afb9704c2462246f2cb6f72fd8199673e521554ec5dd894
+    com.jetbrains.intellij.platform/editor-ui 252.28539.149 SHA-256/472a688063375a2e7be10953a9fee9ecf380fdd6c4633e45917abc692bddd886
+    maven/com.jetbrains.intellij.platform/editor-ui/pom 252.28539.149 SHA-256/0767f8b3c1112c1836389b3909c6acde817819dd976e72d7a97290312ccd8327
+    com.jetbrains.intellij.platform/execution 252.28539.149 SHA-256/2ea87eac2caf50c8a7d37f397b899adb1448770cd8e110854114d71ac35b6bbc
+    maven/com.jetbrains.intellij.platform/execution/pom 252.28539.149 SHA-256/79b0bf8ccec3a5317ae820961c0ffbd79afaf14b3d0ab5b6384c0622ba4e4bb0
+    com.jetbrains.intellij.platform/extensions 252.28539.149 SHA-256/7b09e30aafde8959fa97bc5d7b9bf181f6ad21ab54ce21b46b0e32d52f639f51
+    maven/com.jetbrains.intellij.platform/extensions/pom 252.28539.149 SHA-256/59c56bdf3e1bad89c3d79fdba1b08f053e81a7249d771a5abd0a957daed2ba06
+    com.jetbrains.intellij.platform/ide 252.28539.149 SHA-256/c5436465c5591dd7541bcd98ec337fad54a07d1b7d1b46f8a5f9907da5cc1e26
+    com.jetbrains.intellij.platform/ide-core 252.28539.149 SHA-256/6747a6cb49bef47e9a8ffb2cf7782b7e886382b7973c396b358a21ca93eb23b5
+    maven/com.jetbrains.intellij.platform/ide-core/pom 252.28539.149 SHA-256/b80395580f749f40fdcebfc9507bb3b55c42dc5fbc28b2de65438768e7e70e06
+    com.jetbrains.intellij.platform/ide-util-io 252.28539.149 SHA-256/2a4c1180bd8448f1ff4ab5a8a3b6103f7d3c464eb1f2a1955886bb02c4507505
+    maven/com.jetbrains.intellij.platform/ide-util-io/pom 252.28539.149 SHA-256/9f9fec6ee97c95dc1ac50a820d3ea60ddd9131a1926d772b09b6739e07641747
+    maven/com.jetbrains.intellij.platform/ide/pom 252.28539.149 SHA-256/be3a522b1d1e2186d3e9f80e5ede353355da7dc84c6292fae2a6a4e0b22d4025
+    com.jetbrains.intellij.platform/jps-model 252.28539.149 SHA-256/ad9c405a7824a4fef2621928466e1713e2fd2073e66c0a4e46b4bd423110bbb3
+    maven/com.jetbrains.intellij.platform/jps-model/pom 252.28539.149 SHA-256/a13dd700d78305e1a29a07a61c0cade1cfa0ba772fe7ad13b985cae5c0f46d06
+    com.jetbrains.intellij.platform/project-model 252.28539.149 SHA-256/3917c89a4acecb78c1b3094b395d3a81653a2f295cf394ef2851884a20ba0b1c
+    maven/com.jetbrains.intellij.platform/project-model/pom 252.28539.149 SHA-256/0e7f5240ec708a8b8c288936c50add76ca5837fca6b9d6f246ee2bd72b773275
+    com.jetbrains.intellij.platform/util 252.28539.149 SHA-256/999b08d12cf7f917ea1b6f6a4ab4fb06a84183ca1b0062892eb5c12eda6a3a7a
+    com.jetbrains.intellij.platform/util-base 252.28539.149 SHA-256/b21434062f09addb88fa7024a6fcbd31af3b86e51bc031cc2f97e57d37919b95
+    maven/com.jetbrains.intellij.platform/util-base/pom 252.28539.149 SHA-256/16346e3f493d72c526fe02497ede1d704f796c5039ec238288cada65fc0f6f93
+    com.jetbrains.intellij.platform/util-rt 252.28539.149 SHA-256/4800097b86d9f0a54341d707246401c9c5283031c0876fc0382bcbdd2ff8c9b0
+    maven/com.jetbrains.intellij.platform/util-rt/pom 252.28539.149 SHA-256/b1945de4180814de335f105b38785c4cdcf62fdd7a70f4b12497d5b501810103
+    com.jetbrains.intellij.platform/util-ui 252.28539.149 SHA-256/9171c4d71655fff85a96bea7d0cabbd97f02ba6111bd19fc15c282153f1248b4
+    maven/com.jetbrains.intellij.platform/util-ui/pom 252.28539.149 SHA-256/4a5de35718e43761404b2da10e52947ae83e5e851ddf637d63337ed9febb9203
+    maven/com.jetbrains.intellij.platform/util/pom 252.28539.149 SHA-256/d3e878d931947b2f73708f210ffd47990fca8e7c321c9c34866f9b86ad8935ed
+    net.bytebuddy/byte-buddy 1.17.7 SHA-256/3575dcb8a98faf943d3c1595c47a16047c4fce8a83ebbb26262f1a2f67546357
+    maven/net.bytebuddy/byte-buddy-parent/pom 1.17.7 SHA-256/8a57e20dcce00da71c33ef3e19d9dd858fe9d2042ca2e2bca27871700d52698c
+    maven/net.bytebuddy/byte-buddy/pom 1.17.7 SHA-256/ee7fba8569c3bb5c1e91e5812fd9f4a0f31be27e568d5354e1adfd19119f97b3
+    org.apiguardian/apiguardian-api 1.1.2 SHA-256/b509448ac506d607319f182537f0b35d71007582ec741832a1f111e5b5b70b38
+    maven/org.apiguardian/apiguardian-api/pom 1.1.2 SHA-256/32355081d109095c3d5d374d5a43b4f4c1b75d549e983ef50723e2772e5302a0
+    org.assertj/assertj-core 3.27.6 SHA-256/b27872b049abc88e23c853ce5917945dd57d43bd31175d852e3941d2a6fd0231
+    maven/org.assertj/assertj-core/pom 3.27.6 SHA-256/b0f80945c79d63c3c33d610bd8754d5e9a5436955f7afd683d0160d8612baaec
+    org.jetbrains.kotlin/kotlin-stdlib 2.2.0 SHA-256/65d12d85a3b865c160db9147851712a64b10dadd68b22eea22a95bf8a8670dca
+    maven/org.jetbrains.kotlin/kotlin-stdlib/pom 2.2.0 SHA-256/8c3c821007c13411558739b9f3d5382eb81551db3895cffb89561e56c0f4dc16
+    org.jetbrains/annotations 26.1.0 SHA-256/ebc7aec252ed0c7d2d04c039d7f00e69f7b86b1f493c741d67b3ef31b986b054
+    maven/org.jetbrains/annotations/pom 26.1.0 SHA-256/f8dc50cf3aac4bcec740a90955f2800e41251e9c403630b75b752d3b6ef5bee2
+    org.junit.jupiter/junit-jupiter 5.13.4 SHA-256/b960f79217dd01c863031b678f07df4730bbf1eac650c74ad6b0c61faad78379
+    org.junit.jupiter/junit-jupiter-api 5.13.4 SHA-256/d1bb81abfd9e03418306b4e6a3390c8db52c58372e749c2980ac29f0c08278f1
+    maven/org.junit.jupiter/junit-jupiter-api/pom 5.13.4 SHA-256/c5605357d311813642c400441e047bca717cadc157b3fe7e18985bc6ff232e5b
+    org.junit.jupiter/junit-jupiter-engine 5.13.4 SHA-256/027404a92fe618b72465792a257951495c503a7d5751e2791e0f51c87f67f5bc
+    maven/org.junit.jupiter/junit-jupiter-engine/pom 5.13.4 SHA-256/13836de82d977ff25208f5e0ca9bdf133155dc2efed16af60dfae88e9dcacd47
+    org.junit.jupiter/junit-jupiter-params 5.13.4 SHA-256/3a8c6365716dbb698c0d49a05456c1e1ad05c406613c550f9dd50037872efc41
+    maven/org.junit.jupiter/junit-jupiter-params/pom 5.13.4 SHA-256/c0f36293e2042732d626ee0758cae52c378c2a49579d45bd0815288f20dd4c6c
+    maven/org.junit.jupiter/junit-jupiter/pom 5.13.4 SHA-256/ab7b2c7099f35cfa2b3159a1a5a40b94ee35e212b25a8d7bd97c1227bfaee58e
+    org.junit.platform/junit-platform-commons 1.13.4 SHA-256/1c25ca641ebaae44ff3ad21ca1b2ef68d0dd84bfeb07c4805ba7840899b77408
+    maven/org.junit.platform/junit-platform-commons/pom 1.13.4 SHA-256/44a590d67aec4d276c90c5158fe10478f2133f0a23ec32cfab3aa55d42b86883
+    org.junit.platform/junit-platform-console 1.13.4 SHA-256/addb79920568274b655cdcbb38481ba65f5ba06e8fac5b44c75ee8a3caac25f7
+    maven/org.junit.platform/junit-platform-console/pom 1.13.4 SHA-256/bd10ee9fbc88ef5035a2aa06ce75ddc3c085cc99891b058bb12ca7e3edbf920f
+    org.junit.platform/junit-platform-engine 1.13.4 SHA-256/390c5f77b84283a64b644f88251b397e0b0debb80bdcc50f899881aecff43a5a
+    maven/org.junit.platform/junit-platform-engine/pom 1.13.4 SHA-256/958395424f6b4612bd79d8165ed7bdfaf5a6594f4699b8ef893995ca58c3c0a5
+    org.junit.platform/junit-platform-launcher 1.13.4 SHA-256/0b0beaeb6880a31149641d2d848b863712885469670c12099586d7f798522564
+    maven/org.junit.platform/junit-platform-launcher/pom 1.13.4 SHA-256/3ae3876ae0b87db8bdea1279af2b978da29f138b1e95f605a03d9a52d139dbd2
+    org.junit.platform/junit-platform-reporting 1.13.4 SHA-256/7ebeb4ad2d39a61507623e4c6185651c2bcf560dd378f13229ed2492847c21f6
+    maven/org.junit.platform/junit-platform-reporting/pom 1.13.4 SHA-256/dc30bd1f2bc60d335226953e09c431bd24635532051a98f6c13ecec54e47929f
+    maven/org.junit/junit-bom/pom 5.13.4 SHA-256/d7a08a99b2502f0bb68cd4e1f984f0bf69324aaa208bd0f73366c03fc3548a42
+    org.opentest4j.reporting/open-test-reporting-tooling-spi 0.2.3 SHA-256/f0d54b46fb9e503b22abc65c45a48025aad16051903aaed11f6d974129f74252
+    maven/org.opentest4j.reporting/open-test-reporting-tooling-spi/pom 0.2.3 SHA-256/6d04814f58e754b695141930cd08ab270c3811afd7049ed17813ed62c0522cd3
+    org.opentest4j/opentest4j 1.3.0 SHA-256/48e2df636cab6563ced64dcdff8abb2355627cb236ef0bf37598682ddf742f1b
+    maven/org.opentest4j/opentest4j/pom 1.3.0 SHA-256/9bf7cffc410f3e8372c2522578df9ca56d9d43bd937e30948706c232a943b355
+    -->
+</project>

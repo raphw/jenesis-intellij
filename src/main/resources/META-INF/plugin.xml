@@ -1,0 +1,52 @@
+<idea-plugin>
+    <id>codes.rafael.jenesis</id>
+    <name>Jenesis</name>
+    <version>0.1.0</version>
+    <vendor email="rafael.wth@gmail.com" url="https://github.com/raphw/jenesis-intellij">Rafael Winterhalter</vendor>
+    <idea-version since-build="252"/>
+
+    <description><![CDATA[
+        <p>Loads a <a href="https://jenesis.build">Jenesis</a> build into IntelliJ IDEA and runs its selectors.</p>
+        <ul>
+            <li>Opening a project that carries <code>build/jenesis/Make.java</code> offers to load its modules,
+                which Jenesis writes with its <code>ide/idea</code> selector: one module per module of the build,
+                with its sources, tests and resolved libraries.</li>
+            <li>A banner on <code>pom.xml</code>, <code>module-info.java</code>, <code>jenesis.properties</code>
+                and the files of a <code>build.jenesis</code> folder offers to load the build again once one
+                changed. <b>Tools | Load Jenesis Build</b> does so at any time.</li>
+            <li>A <b>Jenesis</b> run configuration runs any selectors, as <code>stage</code> or
+                <code>+module/test</code>, with <code>-Djenesis.*</code> settings.</li>
+        </ul>
+        <p>Jenesis runs on JDK 25 or newer: the project SDK, another configured JDK or <code>JAVA_HOME</code>.</p>
+    ]]></description>
+
+    <change-notes><![CDATA[
+        <p>Loading a build through <code>ide/idea</code>, a banner on changed build files and a run configuration
+            for selectors.</p>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Jenesis" displayType="BALLOON"/>
+        <postStartupActivity implementation="codes.rafael.jenesis.intellij.JenesisStartup"/>
+        <editorNotificationProvider implementation="codes.rafael.jenesis.intellij.StaleBanner"/>
+        <configurationType implementation="codes.rafael.jenesis.intellij.JenesisConfigurationType"/>
+    </extensions>
+
+    <projectListeners>
+        <listener class="codes.rafael.jenesis.intellij.BuildFileListener"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </projectListeners>
+
+    <actions>
+        <action id="Jenesis.Load"
+                class="codes.rafael.jenesis.intellij.LoadAction"
+                text="Load Jenesis Build"
+                description="Write the modules of the Jenesis build with its ide/idea selector and reload them"
+                icon="/icons/jenesis.svg">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
