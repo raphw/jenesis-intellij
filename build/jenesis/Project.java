@@ -32,6 +32,7 @@ import build.jenesis.project.ProjectModuleDescriptor;
 import build.jenesis.project.ProjectPlugins;
 import build.jenesis.project.ProjectWatch;
 import build.jenesis.project.ReleaseModule;
+import build.jenesis.step.AggregateJavadoc;
 import build.jenesis.step.Bind;
 import build.jenesis.step.Bom;
 import build.jenesis.step.Dependencies;
@@ -197,6 +198,8 @@ public record Project(
             trees.put("native", new ImageStaging("native").noFolder(true));
             trees.put("docker", new ImageStaging("docker"));
             trees.put("reports", new ReportStaging());
+            trees.put("javadoc", AggregateJavadoc.ofEnvironment(project.environment(),
+                    ProcessHandler.Factory.ofEnvironment(project.environment())));
             trees.put(ProjectPlugins.PROJECT, new ProjectFiles());
             executor.addModule(STAGE, project.toolPlugins().stage(project.profiles(), trees), BUILD);
             executor.addModule(EXPORT, (export, _) -> export.addStep("maven", MavenRepositoryExport.ofEnvironment(project.environment()), BuildExecutorModule.PREVIOUS + STAGE + "/maven"), STAGE);
@@ -296,6 +299,8 @@ public record Project(
             trees.put("native", new ImageStaging("native").noFolder(true));
             trees.put("docker", new ImageStaging("docker"));
             trees.put("reports", new ReportStaging());
+            trees.put("javadoc", AggregateJavadoc.ofEnvironment(project.environment(),
+                    ProcessHandler.Factory.ofEnvironment(project.environment())));
             trees.put(ProjectPlugins.PROJECT, new ProjectFiles());
             executor.addModule(STAGE, project.toolPlugins().stage(project.profiles(), trees), BUILD);
             executor.addModule(EXPORT, (export, _) -> export.addStep("modular", JenesisModuleRepositoryExport.ofEnvironment(project.environment()), BuildExecutorModule.PREVIOUS + STAGE + "/modular"), STAGE);
@@ -400,6 +405,8 @@ public record Project(
             trees.put("native", new ImageStaging("native").noFolder(true));
             trees.put("docker", new ImageStaging("docker"));
             trees.put("reports", new ReportStaging());
+            trees.put("javadoc", AggregateJavadoc.ofEnvironment(project.environment(),
+                    ProcessHandler.Factory.ofEnvironment(project.environment())));
             trees.put(ProjectPlugins.PROJECT, new ProjectFiles());
             executor.addModule(STAGE, project.toolPlugins().stage(project.profiles(), trees), BUILD);
             executor.addModule(EXPORT, (export, _) -> {
@@ -1522,6 +1529,10 @@ public record Project(
                           build resolves where a module holds one, with Groovy 4 or newer after javac, so Groovy uses Java types and Java no Groovy type:
                           gmavenplus stubs for a joint compilation have no counterpart, and Java code
                           that uses Groovy moves to a module that requires the Groovy one
+                      clojure-maven-plugin / clojure -> .clj sources in src/main/clojure, named by
+                          jenesis.maven.sources=clojure and compiled by the Clojure plugin the build
+                          resolves where a module holds one, after javac and with the
+                          org.clojure:clojure the pom.xml declares (82)
                       jaxb2-maven-plugin / a JAXB plugin -> xjc.properties, binding the schemas
                           as @schemas/xjc=<folder> (17)
                       protobuf-maven-plugin / com.google.protobuf -> protoc.properties, binding
@@ -1768,6 +1779,12 @@ public record Project(
                           excludePackageNames -> -exclude=<package>[:<package>...] there, which
                           leaves those packages and their subpackages undocumented; the language
                           plugins document their sources beside it, the Kotlin plugin with Dokka
+                      maven-javadoc-plugin javadoc:aggregate / aggregate-jar
+                          -> -Djenesis.documentation.aggregate=true beside
+                          -Djenesis.project.sources=true (3): one javadoc run over the sources jars of
+                          every staged module but the test modules, as modules where each declares
+                          one, staged as target/stage/javadoc/output/javadoc/ and javadoc.jar,
+                          attached to no coordinate; it takes no process-javadoc.properties
                       maven-jar-plugin <classifier> executions, build-helper attach-artifact of a
                           prepared file -> classifiers.properties, one <classifier>=<folder>[,...]
                           line per variant: the module's jar plus each folder's files, staged
@@ -2678,8 +2695,8 @@ public record Project(
                     The plugins of jenesis/jenesis-plugins need no line: the build resolves each by its
                     module name where its <name>.properties is found in a configuration folder -
                     checkstyle.properties, xjc.properties, jacoco.properties, asciidoctor.properties,
-                    jreleaser.properties and the like - or, for a language, where a .kt, .scala or
-                    .groovy source is. The properties name the tool's own file as
+                    jreleaser.properties and the like - or, for a language, where a .kt, .scala,
+                    .groovy or .clj source is. The properties name the tool's own file as
                     configuration=<path, relative to them>, and fail the build naming the key where
                     they leave it out; only where no properties are found does the tool's one
                     conventional file in a configuration folder - checkstyle.xml, pmd.xml, rewrite.yml,
@@ -2926,7 +2943,7 @@ public record Project(
                 case "demos" -> """
                     # Jenesis - Copy a demo
 
-                    81 demos under `demo/`, each self-contained, runnable and minimal, ordered so the
+                    82 demos under `demo/`, each self-contained, runnable and minimal, ordered so the
                     sequence doubles as a tutorial; `demo/README.md` indexes them. Find the one
                     matching the task and copy its shape rather than inventing configuration.
 
@@ -2972,7 +2989,8 @@ public record Project(
                                          45 api-compatibility (japicmp, revapi)
                       Other languages    46 kotlin, 47 kotlin-quality, 48 kotlin-plugin,
                                          49 ksp (a Kotlin symbol processor), 50 scala,
-                                         51 scala-quality, 52 groovy, 53 groovy-quality
+                                         51 scala-quality, 52 groovy, 53 groovy-quality,
+                                         82 clojure (a pom.xml module beside src/main/clojure)
                       At run time        54 agents (@jenesis.attach),
                                          55 native-access (@jenesis.native),
                                          56 native-access-layer (passed on to a layer),
@@ -4723,6 +4741,7 @@ public record Project(
                 project.sources|false|Assemble a sources jar for every staged module
                 project.documentation|false|Assemble a javadoc jar for every staged module
                 documentation.empty|false|Archive that javadoc jar holding nothing but an INTENTIONALLY_EMPTY file instead of rendering the documentation, for a repository such as Maven Central that requires the jar but not its content
+                documentation.aggregate|false|Document every staged module in one javadoc run, staged as a site and a javadoc.jar under stage/javadoc; requires jenesis.project.sources, as it reads each module's sources jar
                 project.version||Version stamped onto every produced artifact, a module version that starts with a digit; unset leaves modules unversioned and POMs at 0-SNAPSHOT, and an empty value is refused
                 project.tag||SCM tag recorded in the generated POM and SBOM; empty for none
                 project.revision||Source revision, such as a commit id, recorded in the SBOM; empty for none
@@ -4755,8 +4774,9 @@ public record Project(
                 make.home||The folder holding ~/.jenesis/jenesis.properties, derived by Make and settable in no file
                 make.ambient||Settings that the command line supplied, likewise, so that a path named there is relative to make.directory
                 make.directory||The working directory of the command line, which a relative path named there resolves against; set by the command and the tools, kept by a daemon or container they hand the build to, and settable in no file
-                make.mode|daemon|How the engine runs: source runs it from the build sources, compiled compiles them once and runs from those classes, aot runs those classes in a JVM that loads them from an ahead-of-time cache in aot.folder, trained on the first build that finds none and reused by every later one, and daemon hands the build to a reused JVM, which --stop as the only selector shuts down, every daemon of daemon.folder with it; unset, it is daemon, or compiled where process.mode names fork or aot, project.docker is set or release.publish publishes, so that a release runs in a JVM no earlier build ran in; aot applies where the engine runs compiled, as the installed CLI runs it, and in source mode caches only the tools, whose JVM is running before it could be handed a cache; aot and daemon set process.mode to the same unless it is set; the [STARTED] line and the started event of the events file name the mode the build ran in
+                make.mode|daemon|How the engine runs: source runs it from the build sources, compiled compiles them once and runs from those classes, aot runs those classes in a JVM that loads them from an ahead-of-time cache in aot.folder, trained on the first build that finds none and reused by every later one, native runs a native image of the engine, compiled with the native-image of the GraalVM running Make once per engine and what the builds it ran on that GraalVM's JVM under the tracing agent recorded, kept in aot.folder, which loads plugins from their jars as a JVM does where a build it was trained by loaded one and is compiled without loading classes at run time otherwise, and fails a build reaching what the agent never recorded until the engine changes or the native folder of aot.folder is deleted, and daemon hands the build to a reused JVM, which --stop as the only selector shuts down, every daemon of daemon.folder with it; unset, it is daemon, or compiled where process.mode names fork or aot, project.docker is set or release.publish publishes, so that a release runs in a JVM no earlier build ran in; aot applies where the engine runs compiled, as the installed CLI runs it, and in source mode caches only the tools, whose JVM is running before it could be handed a cache; aot and daemon set process.mode to the same unless it is set, and native sets it to aot; the [STARTED] line and the started event of the events file name the mode the build ran in
                 make.classes|.jenesis/classes|Where those classes land, relative to the working directory on the command line and to the project root in a file; a file a project provides names only a folder inside the project
+                make.native||The file in the native folder of aot.folder that a build loading a plugin creates, which Make names for the builds that train a native image and for an image compiled without loading classes at run time, so that a build loading a plugin in such an image fails and the next one trains an image that loads plugins; only settable on the command line
                 daemon.idle|10800|Seconds an idle daemon waits before exiting; only the command line or ~/.jenesis/jenesis.properties may set it, never a file a project provides
                 daemon.options||JVM options for the daemon process itself, whitespace separated; unset, the daemon starts with the -D, -X and -ea options of the JVM that hands it the build, and a JVM started with others gets a daemon of its own; only the command line or ~/.jenesis/jenesis.properties may set it, never a file a project provides
                 daemon.shared|true|Hand the build to a daemon any project may use that runs the same engine on the same JVM with the same options and environment, which runs in a folder of its own, so that a plugin resolving a path against the working directory rather than against a folder it is handed resolves it in that folder; false keeps daemons for this project alone, started in its root, which on Windows keeps the project's folder in use for as long as one runs; either way, after each build a daemon restores the system properties, the default locale and the default time zone, and ends once a build changed a JVM-wide default it cannot restore, as the security providers, the default TLS context, authenticator, proxy selector, cookie handler or uncaught exception handler
@@ -4775,7 +4795,7 @@ public record Project(
                 executor.events|true|Write each step's outcome of the latest build as one JSON object per line to .jenesis.events.jsonl in the target folder, replaced by every build
                 process.concurrency|(processor count)|Run at most this many tool runs at once - a compiler, a JDK tool, a forked JVM such as a test run; 0 is unbounded
                 process.factory|tool|tool|fork; fork runs a JDK tool in a process of its own
-                process.mode|fork|How the main method of a tool that a plugin starts through ProcessHandler.OfProcess.ofJavaMain() runs, and javac where a -J option forks it: fork starts a JVM for every call that process.shared does not hand to a shared JVM, so that a build without the daemon leaves no JVM running; aot starts that JVM from an ahead-of-time cache of the tool in aot.folder, which its first run trains and every later one reads, one per JVM, options and jars, with the jars linked into it; daemon runs it in one JVM that runs its compilations side by side, as it runs the calls a plugin marks shared, kept for the next call with the same jars on its class path, wherever a module resolved them, and the same options, environment and working directory, idle ones ending after ten minutes; make.mode=aot and make.mode=daemon set it to the same unless it is set
+                process.mode|fork|How the main method of a tool that a plugin starts through ProcessHandler.OfProcess.ofJavaMain() runs, and javac where a -J option forks it: fork starts a JVM for every call that process.shared does not hand to a shared JVM, so that a build without the daemon leaves no JVM running; aot starts that JVM from an ahead-of-time cache of the tool in aot.folder, which its first run trains and every later one reads, one per JVM, options and jars, with the jars linked into it; native starts it from a native image of the tool in aot.folder, one per JVM, options and the content of its jars, which the native-image beside that JVM compiles once its first run, on the JVM under the tracing agent, ended, and a run reaching what that first run never reached fails the build; daemon runs it in one JVM that runs its compilations side by side, as it runs the calls a plugin marks shared, kept for the next call with the same jars on its class path, wherever a module resolved them, and the same options, environment and working directory, idle ones ending after ten minutes; make.mode=aot and make.mode=daemon set it to the same unless it is set, and make.mode=native sets it to aot
                 process.directory||Working directory of every process the build starts, a test JVM and a warm JVM included, relative to the working directory on the command line and to the project root in a file; default: the project root
                 process.shared|true|Run the calls a plugin marks shared, a compiler above all, and javac where a -J option forks it, side by side in one JVM per JVM, options, jars and environment, ended when the build ends, under process.mode fork and aot as under daemon, which keeps it for the next build; false starts a JVM for every such call
                 process.tail|200|Lines of a failed tool's output and of its error printed with the failure, the last ones, beside how many there were and the file under supplement/ that holds all of them; 0 prints every line
@@ -4852,7 +4872,7 @@ public record Project(
                 test.concurrency|0|Run at most this many test runs at once across the build, each a forked JVM, while every other step keeps running; 1 runs one module's tests at a time, as Maven does, and 0 leaves them bounded by process.concurrency alone
                 test.reporting|false|Write a test run's reports into the module's reports/tests folder - the legacy JUnit XML and the open-test-reporting XML - and name that folder when the run fails; without it the JUnit Platform writes none
                 stage.tests|false|Stage test modules alongside the main ones; a test module is otherwise unstaged, as stage=false leaves a module
-                tree.format|full|full|compact: what the dependencies selector prints
+                tree.format|full|full|compact|java: what the dependencies selector prints; java prints, for every module but the test modules, the options, module path, class path and main class java runs it with, as the lines of an argument file
                 tree.merge|true|One tree per module whose every node names the scopes it applies to; false prints one tree per module and scope
                 tree.internal|false|List the project's own modules among the resolved dependencies and count them in the license summary
                 tree.tests|true|Include test-variant modules in that output
@@ -4924,6 +4944,7 @@ public record Project(
                 language.kotlin|true|Kotlin, the official plugin build.jenesis.plugin.kotlin, resolved where a module holds a .kt source; false leaves it out, and such a source then fails the build
                 language.scala|true|Scala, the official plugin build.jenesis.plugin.scala, resolved where a module holds a .scala source; false leaves it out, and such a source then fails the build
                 language.groovy|true|Groovy, the official plugin build.jenesis.plugin.groovy, resolved where a module holds a .groovy source; false leaves it out, and such a source then fails the build
+                language.clojure|true|Clojure, the official plugin build.jenesis.plugin.clojure, resolved where a module holds a .clj source, which compiles its namespaces with the Clojure the module depends on; false leaves it out, and such a source then fails the build
                 kotlin.incremental|false|Compile Kotlin incrementally through the Kotlin Build Tools API of Kotlin 2.3 or newer, resolved as org.jetbrains.kotlin:kotlin-build-tools-impl, which recompiles only what a change reaches, in a JVM of its own per compile or in one kept warm under process.mode=daemon; the -J and -D lines of process-kotlinc.properties configure that JVM
                 scala.incremental|false|Compile Scala incrementally with Zinc, resolved as org.scala-sbt:zinc_2.13 in the group scala:zinc and driving the compiler through org.scala-lang:scala3-sbt-bridge at the compiler's version, which recompiles only what a change reaches, in a JVM of its own per compile or in one kept warm under process.mode=daemon; the lines of process-scalac.properties configure that JVM
                 jarsigner.keystore||Key store jarsigner signs the produced jar with, in place of the unsigned one, relative to the working directory on the command line, to ~/.jenesis in its files and to the project root in a project's; a release machine supplies it, and a build that names any jarsigner setting without it fails rather than shipping unsigned; only the command line or ~/.jenesis/jenesis.properties may set it, never a file a project provides
